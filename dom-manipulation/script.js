@@ -324,19 +324,37 @@ async function syncQuotes() {
 
   saveQuotes();
   populateCategories();
+  showRandomQuote();
 
-  if (conflictsResolved) {
-    // UI notification for conflicts
-    const notif = document.createElement("div");
-    notif.textContent = `${conflictsResolved} new quote(s) synced from server.`;
-    notif.style.background = "#fffae6";
-    notif.style.border = "1px solid #ffd42a";
-    notif.style.padding = "0.5rem";
-    notif.style.marginTop = "1rem";
-    document.body.insertBefore(notif, document.body.firstChild);
-    setTimeout(() => notif.remove(), 5000);
-    showRandomQuote();
+  // Show notification
+  if (conflictsResolved > 0) {
+    showSyncNotification(
+      `Quotes synced with server! (${conflictsResolved} new quote(s))`
+    );
+  } else {
+    showSyncNotification("Quotes synced with server!"); // even if no new quotes
   }
+}
+
+function showSyncNotification(message = "Quotes synced with server!") {
+  // create notification element
+  const notif = document.createElement("div");
+  notif.textContent = message;
+  notif.style.position = "fixed";
+  notif.style.top = "10px";
+  notif.style.right = "10px";
+  notif.style.background = "#d4edda";
+  notif.style.color = "#155724";
+  notif.style.border = "1px solid #c3e6cb";
+  notif.style.padding = "10px 20px";
+  notif.style.borderRadius = "5px";
+  notif.style.zIndex = "1000";
+  notif.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+
+  document.body.appendChild(notif);
+
+  // automatically remove after 3 seconds
+  setTimeout(() => notif.remove(), 3000);
 }
 
 // 4️⃣ Periodic sync
