@@ -261,6 +261,87 @@ async function syncLocalWithServer() {
   }
 }
 
+// 1️⃣ Fetch quotes from server (renamed to match checklist)
+async function fetchQuotesFromServer() {
+  try {
+    const res = await fetch(SERVER_API);
+    if (!res.ok) throw new Error("Failed to fetch server quotes");
+    const data = await res.json();
+    return data.map((post) => ({
+      text: post.body,
+      category: post.title,
+      id: post.id,
+    }));
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
+
+// 2️⃣ Post new local quotes to server
+async function postQuoteToServer(quote) {
+  try {
+    const res = await fetch(SERVER_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: quote.category, body: quote.text }),
+    });
+    if (!res.ok) throw new Error("Failed to post quote to server");
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
+// 3️⃣ Sync function (explicitly named)
+async function syncQuotes() {
+  const serverQuotes = await fetchQuotesFromServer();
+  if (!serverQuotes.length) return;
+
+  let conflictsResolved = 0;
+  const localKeys = new Set(quotes.map((q) => `${q.text}|||${q.category}`));
+
+  // Merge server quotes
+  serverQuotes.forEach((sq) => {
+    const key = `${sq.text}|||${sq.category}`;
+    if (!localKeys.has(key)) {
+      quotes.push({ text: sq.text, category: sq.category });
+      localKeys.add(key);
+      conflictsResolved++;
+    }
+  });
+
+  // Post local-only quotes to server
+  for (let q of quotes) {
+    const existsOnServer = serverQuotes.some(
+      (sq) => sq.text === q.text && sq.category === q.category
+    );
+    if (!existsOnServer) {
+      await postQuoteToServer(q);
+    }
+  }
+
+  saveQuotes();
+  populateCategories();
+
+  if (conflictsResolved) {
+    // UI notification for conflicts
+    const notif = document.createElement("div");
+    notif.textContent = `${conflictsResolved} new quote(s) synced from server.`;
+    notif.style.background = "#fffae6";
+    notif.style.border = "1px solid #ffd42a";
+    notif.style.padding = "0.5rem";
+    notif.style.marginTop = "1rem";
+    document.body.insertBefore(notif, document.body.firstChild);
+    setTimeout(() => notif.remove(), 5000);
+    showRandomQuote();
+  }
+}
+
+// 4️⃣ Periodic sync
+setInterval(syncQuotes, 30000);
+
 // ------------------------
 // Initialization
 // ------------------------
