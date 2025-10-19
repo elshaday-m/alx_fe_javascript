@@ -65,6 +65,16 @@
       <button id="newQuote">Show New Quote</button>
     </div>
 
+    <!-- Category filter dropdown -->
+    <div>
+      <label for="categoryFilter">Filter by Category:</label>
+      <select id="categoryFilter" onchange="filterQuotes()">
+        <option value="all">All Categories</option>
+        <!-- options populated dynamically -->
+      </select>
+      <button id="newQuote">Show New Quote</button>
+    </div>
+
     <div id="quoteDisplay" aria-live="polite"></div>
 
     <!-- The add-quote form will be generated dynamically by script.js if it's not present.
