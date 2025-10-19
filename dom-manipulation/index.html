@@ -70,6 +70,22 @@
     <!-- The add-quote form will be generated dynamically by script.js if it's not present.
        (You may keep static markup here; script.js avoids creating duplicates.) -->
     <div id="staticFormPlaceholder"></div>
+    <div class="form-section" id="addQuoteSection">
+      <h3>Add a New Quote</h3>
+      <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+      <input
+        id="newQuoteCategory"
+        type="text"
+        placeholder="Enter quote category"
+      />
+      <button id="addQuoteBtn">Add Quote</button>
+
+      <div style="margin-top: 12px">
+        <button id="exportBtn">Export Quotes (JSON)</button>
+        <label class="small"> Import JSON: </label>
+        <input type="file" id="importFile" accept=".json,application/json" />
+      </div>
+    </div>
 
     <script src="script.js"></script>
   </body>

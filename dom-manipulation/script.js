@@ -376,6 +376,19 @@ function createAddQuoteForm(targetContainerId = "staticFormPlaceholder") {
   parent.appendChild(container);
 }
 
+// Wire static buttons to functions if they exist
+const exportBtn = document.getElementById("exportBtn");
+if (exportBtn) exportBtn.addEventListener("click", exportQuotesToJson);
+
+const importFile = document.getElementById("importFile");
+if (importFile) {
+  importFile.addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) importFromJsonFile(file);
+    e.target.value = ""; // reset input
+  });
+}
+
 /* -------------------------
    Initialization
    ------------------------- */
